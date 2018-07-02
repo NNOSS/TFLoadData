@@ -93,6 +93,8 @@ class FromJPEG:
                     image = image.resize([image.size[0], face_height], Image.BILINEAR)
                 elif j < 0:
                     image = image.resize([face_width, image.size[1]], Image.BILINEAR)
+                j = (image.size[0] - face_width) // 2
+                i = (image.size[1] - face_height) // 2
                 image = image.crop([j, i, j + face_width, i + face_height])
         return np.array(image.convert(mode))
     @staticmethod
@@ -102,7 +104,7 @@ class FromJPEG:
         """
         # print('get file')
         data_batch = np.array(
-            [get_image(sample_file, width, height, mode, box=box) for sample_file in image_files]).astype(np.float32)
+            [FromJPEG.get_image(sample_file, width, height, mode, box=box) for sample_file in image_files]).astype(np.uint8)
         # Make sure the images are in 4 dimensions
         if len(data_batch.shape) < 4:
             data_batch = data_batch.reshape(data_batch.shape + (1,))

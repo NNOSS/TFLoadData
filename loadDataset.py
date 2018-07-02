@@ -35,26 +35,28 @@ class MNIST:
         return tf.to_int32(label)
 
 class ImageNet:
-    mnist_file_path = '/Data/ImageNet_data/'
-    IMAGE_SIZE = 256, 256, 3
+    imagenet_file_path ='/Data/Imagenet/'
+    IMAGE_SIZE = 512, 512, 3
     IMAGE_LEN = IMAGE_SIZE[0] * IMAGE_SIZE[1] * IMAGE_SIZE[2]
     NUM_TRAIN = 5
     NUM_TEST = 1
     NUM_CLASSES = 200
     NUM_BYTES = 1
 
-    train_images = ['train_images_'+ str(i) for i in range(num_train)]
-    train_labels = ['train_labels_'+ str(i) for i in range(num_train)]
-    test_images = ['test_images'+ str(i) for i in range(num_test)]
-    test_labels = ['test_labels'+ str(i) for i in range(num_test)]
+    # train_images = ['train_images_'+ str(i) for i in range(num_train)]
+    # train_labels = ['train_labels_'+ str(i) for i in range(num_train)]
+    train_images = ['train_images']
+    train_labels = ['train_labels']
+    test_images = ['test_images'+ str(i) for i in range(NUM_TEST)]
+    test_labels = ['test_labels'+ str(i) for i in range(NUM_TEST)]
     @staticmethod
     def return_dataset_train():
-        images_file = [mnist_file_path + val for val in train_images]
-        labels_file = [mnist_file_path + val for val in train_labels]
+        images_file = [ImageNet.imagenet_file_path + val for val in ImageNet.train_images]
+        labels_file = [ImageNet.imagenet_file_path + val for val in ImageNet.train_labels]
         images = tf.data.FixedLengthRecordDataset(
-          images_file, IMAGE_LEN * NUM_BYTES).map(mnist_decode_image)
+          images_file, ImageNet.IMAGE_LEN * ImageNet.NUM_BYTES).map(ImageNet.decode_image)
         labels = tf.data.FixedLengthRecordDataset(
-          labels_file, NUM_CLASSES).map(mnist_decode_label)
+          labels_file, ImageNet.NUM_CLASSES).map(ImageNet.decode_label)
         return tf.data.Dataset.zip((images, labels))
     @staticmethod
     def return_dataset_test():
@@ -70,12 +72,11 @@ class ImageNet:
         # Normalize from [0, 255] to [0.0, 1.0]
         image = tf.decode_raw(image, tf.uint8)
         image = tf.cast(image, tf.float32)
-        image = tf.reshape(image, [IMAGE_SIZE[0], IMAGE_SIZE[1],IMAGE_SIZE[2]])
+        image = tf.reshape(image, [ImageNet.IMAGE_SIZE[0], ImageNet.IMAGE_SIZE[1],ImageNet.IMAGE_SIZE[2]])
         return image / 255.0
     @staticmethod
     def decode_label(label):
-        label = tf.decode_raw(label, tf.uint8)# tf.string -> [tf.uint8]
-        label = tf.reshape(label, [])  # label is a scalar
+        label = tf.decode_raw(label, tf.int8)# tf.string -> [tf.uint8]
         return tf.to_int32(label)
 
 
